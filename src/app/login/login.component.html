@@ -1,0 +1,14 @@
+<body>
+    <form autocomplete="off" class="login">
+        <h1 class="login-title">Bienvenido</h1>
+        <input name="email" required type="email" class="login-input" placeholder="Email Adress" autofocus>
+        <input ngModel name="password" required type="password" class="login-input" placeholder="Password">
+        <div class="form-check">
+            <input name="recuerdame" type="checkbox" class="form-check-input" id="checkbox-signup">
+            <label class="form-check-label" for="checkbox-signup"> Recuérdame</label>
+        </div>
+        <input type="submit" value="Login" class="login-button">
+        <br> <br>
+        <p class="login-lost">¿No tiene cuenta? <a routerLink="/register" class="text-primary"> Crear una cuenta</a></p>
+    </form>
+</body>
