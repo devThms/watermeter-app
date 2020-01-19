@@ -1,0 +1,186 @@
+<div class="row animated fadeIn" *ngIf="cargando">
+    <div class="col-sm-12">
+        <div class="alert alert-warning text-center">
+            <strong> Cargando </strong>
+            <br>
+            <i class=" fa fa-refresh fa-spin fa-2x"></i>
+            <br>
+            <span> Espere por favor</span>
+        </div>
+    </div>
+</div>
+
+<div class="row animated fadeIn" *ngIf="!cargando">
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header bg-dark text-white">
+                Clientes Registrados ( <small> {{ totalRegistros }} </small> )
+                <span class="pull-right"><button (click)="showModalCreate()" class="btn btn-rounded btn-outline-success"><i class="fa fa-plus"> </i> Crear </button></span>
+            </h5>
+
+            <div class="card-body text-black">
+                <div class="row">
+                    <div class="col-7">
+                        Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                    </div>
+                </div>
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th> # </th>
+                            <th> NIT </th>
+                            <th> Nombre Completo </th>
+                            <th> Telefono </th>
+                            <th> Estado </th>
+                            <th width="150px"> Acciones </th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-dark">
+                        <tr *ngFor="let customer of customers">
+                            <td> {{ customer.id }} </td>
+                            <td> {{ customer.NIT }} </td>
+                            <td> {{ customer.firstName + ' ' + customer.lastName }} </td>
+                            <td> {{ customer.telephone }} </td>
+                            <td> {{ customer.status }} </td>
+                            <td>
+                                <button (click)="showModalUpdate( customer )" class="btn btn-outline-primary"> <i class="fa fa-pencil-square-o"></i></button>
+                                <button (click)="borrarCliente( customer )" class="btn btn-outline-danger"> <i class="fa fa-trash-o"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="col-12">
+                    <span class="pull-right">
+                              <button [disabled]="pages.hasPrevious" (click)="cargarClientes(pages.getPrevious())" class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> Anteriores </button>
+                              <button [disabled]="pages.hasNext" (click)="cargarClientes(pages.getNext())" class="btn btn-outline-inverse"> Siguientes <i class="fa fa-arrow-right"> </i></button>
+                      </span>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Create Customer -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalCreate">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-plus"> </i> Crear Cliente</b></h5>
+                    <button (click)="hideModalCreate()" type="button" class="close" aria-label="Close">
+                             <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+
+                <form ngNativeValidate #fCustomer="ngForm" (ngSubmit)="crearCliente(fCustomer.value)" class="form-horizontal form-material" autocomplete="off">
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> NIT de Cliente: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="customer.NIT" name="NIT" type="text" class="form-control form-control-line" placeholder="Ej: 8002218-9..." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Nombres de Cliente: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="customer.firstName" name="firstName" type="text" class="form-control form-control-line" placeholder="Ej: Thomas..." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Apellidos de Cliente: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="customer.lastName" name="lastName" type="text" class="form-control form-control-line" placeholder="Ej: Jimenez C...." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Dirección de Cliente: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="customer.address" name="address" type="text" class="form-control form-control-line" placeholder="Ej: Ciudad de Guatemala ..." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> telefono de Cliente: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="customer.telephone" name="telephone" type="number" class="form-control form-control-line" placeholder="Ej: 79489649" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-success"><i class="fa fa-save"> </i> Guardar</button>
+                        <button (click)="hideModalCreate()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Update Customer -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalUpdate">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-edit"> </i> Actualizar Datos de Cliente</b></h5>
+                    <button (click)="hideModalUpdate()" type="button" class="close" aria-label="Close">
+                             <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+
+                <form autocomplete="off" ngNativeValidate #fCustomerUpd="ngForm" (ngSubmit)="actualizarCliente(fCustomerUpd.value)" class="form-horizontal form-material">
+
+                    <div class="modal-body">
+                        <input [ngModel]="customer.id" name="id" type="hidden">
+
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> NIT de Cliente: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="customer.NIT" name="NIT" type="text" class="form-control form-control-line" placeholder="Ej: 8002218-9..." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Nombres de Cliente: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="customer.firstName" name="firstName" type="text" class="form-control form-control-line" placeholder="Ej: Thomas..." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Apellidos de Cliente: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="customer.lastName" name="lastName" type="text" class="form-control form-control-line" placeholder="Ej: Jimenez C...." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Dirección de Cliente: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="customer.address" name="address" type="text" class="form-control form-control-line" placeholder="Ej: Ciudad de Guatemala ..." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> telefono de Cliente: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="customer.telephone" name="telephone" type="number" class="form-control form-control-line" placeholder="Ej: 79489649" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-success"><i class="fa fa-save"> </i> Guardar</button>
+                        <button (click)="hideModalUpdate()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>

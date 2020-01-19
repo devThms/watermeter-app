@@ -5,12 +5,139 @@
     <div class="scroll-sidebar">
         <!-- Sidebar navigation-->
         <nav class="sidebar-nav">
-            <ul id="sidebarnav">
-                <li> <a class="waves-effect waves-dark" href="index.html" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Dashboard</span></a></li>
-                <li> <a class="waves-effect waves-dark" href="#" aria-expanded="false"><i class="mdi mdi-account-check"></i><span class="hide-menu">Datos Maestros</span></a></li>
-                <li> <a class="waves-effect waves-dark" href="#" aria-expanded="false"><i class="mdi mdi-table"></i><span class="hide-menu">Ordenes</span></a></li>
-                <li> <a class="waves-effect waves-dark" href="#" aria-expanded="false"><i class="mdi mdi-emoticon"></i><span class="hide-menu">Tesoreria</span></a></li>
+
+            <ul *ngIf="usuario.role_id === 1" id="sidebarnav">
+                <li class="user-profile">
+                    <a *ngIf="usuario.role_id === 1" class="has-arrow waves-effect waves-dark" aria-expanded="false"><img src="assets/images/users/user-administrator.jpg" alt="user"><span class="hide-menu"> {{ usuario.name }} <span class="label label-rouded label-themecolor pull-right"> 3 </span></span>
+                    </a>
+                    <a *ngIf="usuario.role_id != 1" class="has-arrow waves-effect waves-dark" aria-expanded="false"><img src="assets/images/users/user-profile.png" alt="user"><span class="hide-menu"> {{ usuario.name }} <span class="label label-rouded label-themecolor pull-right"> 3 </span></span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li>
+                            <a routerLinkActive="active" routerLink="/dashboard"> <i class="mdi mdi-gauge"></i> Dashboard </a>
+                        </li>
+                        <li>
+                            <a routerLinkActive="active" routerLink="/perfil"> <i class="ti-user"></i> Perfil </a>
+                        </li>
+                        <li>
+                            <a (click)="_usuarioService.logout()" class="pointer"> <i class="fa fa-power-off"></i> Logout</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-devider"></li>
+
+                <li *ngFor="let menu of _sidebar.menuAdmin">
+                    <a class="has-arrow waves-effect waves-dark" aria-expanded="false"> <i [class]="menu.icono"></i><span class="hide-menu"> {{ menu.titulo }}<span class="label label-rouded label-themecolor pull-right"> {{ menu.submenu.length }} </span></span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li *ngFor="let submenu of menu.submenu">
+                            <a routerLinkActive="active" [routerLink]="[ submenu.url ]"><i [class]="submenu.icono"></i> {{ submenu.titulo }}</a>
+                        </li>
+                    </ul>
+                </li>
+
             </ul>
+
+            <ul *ngIf="usuario.role_id === 2" id="sidebarnav">
+                <li class="user-profile">
+                    <a *ngIf="usuario.role_id === 1" class="has-arrow waves-effect waves-dark" aria-expanded="false"><img src="assets/images/users/user-administrator.jpg" alt="user"><span class="hide-menu"> {{ usuario.name }} <span class="label label-rouded label-themecolor pull-right"> 3 </span></span>
+                    </a>
+                    <a *ngIf="usuario.role_id != 1" class="has-arrow waves-effect waves-dark" aria-expanded="false"><img src="assets/images/users/user-profile.png" alt="user"><span class="hide-menu"> {{ usuario.name }} <span class="label label-rouded label-themecolor pull-right"> 3 </span></span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li>
+                            <a routerLinkActive="active" routerLink="/dashboard"> <i class="mdi mdi-gauge"></i> Dashboard </a>
+                        </li>
+                        <li>
+                            <a routerLinkActive="active" routerLink="/perfil"> <i class="ti-user"></i> Perfil </a>
+                        </li>
+                        <li>
+                            <a (click)="_usuarioService.logout()" class="pointer"> <i class="fa fa-power-off"></i> Logout</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-devider"></li>
+
+                <li *ngFor="let menu of _sidebar.menuAdmin">
+                    <a class="has-arrow waves-effect waves-dark" aria-expanded="false"> <i [class]="menu.icono"></i><span class="hide-menu"> {{ menu.titulo }}<span class="label label-rouded label-themecolor pull-right"> {{ menu.submenu.length }} </span></span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li *ngFor="let submenu of menu.submenu">
+                            <a routerLinkActive="active" [routerLink]="[ submenu.url ]"><i [class]="submenu.icono"></i> {{ submenu.titulo }}</a>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+
+            <ul *ngIf="usuario.role_id === 3" id="sidebarnav">
+                <li class="user-profile">
+                    <a *ngIf="usuario.role_id === 1" class="has-arrow waves-effect waves-dark" aria-expanded="false"><img src="assets/images/users/user-administrator.jpg" alt="user"><span class="hide-menu"> {{ usuario.name }} <span class="label label-rouded label-themecolor pull-right"> 3 </span></span>
+                    </a>
+                    <a *ngIf="usuario.role_id != 1" class="has-arrow waves-effect waves-dark" aria-expanded="false"><img src="assets/images/users/user-profile.png" alt="user"><span class="hide-menu"> {{ usuario.name }} <span class="label label-rouded label-themecolor pull-right"> 3 </span></span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li>
+                            <a routerLinkActive="active" routerLink="/dashboard"> <i class="mdi mdi-gauge"></i> Dashboard </a>
+                        </li>
+                        <li>
+                            <a routerLinkActive="active" routerLink="/perfil"> <i class="ti-user"></i> Perfil </a>
+                        </li>
+                        <li>
+                            <a (click)="_usuarioService.logout()" class="pointer"> <i class="fa fa-power-off"></i> Logout</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-devider"></li>
+
+                <li *ngFor="let menu of _sidebar.menuConta">
+                    <a class="has-arrow waves-effect waves-dark" aria-expanded="false"> <i [class]="menu.icono"></i><span class="hide-menu"> {{ menu.titulo }}<span class="label label-rouded label-themecolor pull-right"> {{ menu.submenu.length }} </span></span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li *ngFor="let submenu of menu.submenu">
+                            <a routerLinkActive="active" [routerLink]="[ submenu.url ]"><i [class]="submenu.icono"></i> {{ submenu.titulo }}</a>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+
+            <ul *ngIf="usuario.role_id === 4" id="sidebarnav">
+                <li class="user-profile">
+                    <a *ngIf="usuario.role_id === 1" class="has-arrow waves-effect waves-dark" aria-expanded="false"><img src="assets/images/users/user-administrator.jpg" alt="user"><span class="hide-menu"> {{ usuario.name }} <span class="label label-rouded label-themecolor pull-right"> 3 </span></span>
+                    </a>
+                    <a *ngIf="usuario.role_id != 1" class="has-arrow waves-effect waves-dark" aria-expanded="false"><img src="assets/images/users/user-profile.png" alt="user"><span class="hide-menu"> {{ usuario.name }} <span class="label label-rouded label-themecolor pull-right"> 3 </span></span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li>
+                            <a routerLinkActive="active" routerLink="/dashboard"> <i class="mdi mdi-gauge"></i> Dashboard </a>
+                        </li>
+                        <li>
+                            <a routerLinkActive="active" routerLink="/perfil"> <i class="ti-user"></i> Perfil </a>
+                        </li>
+                        <li>
+                            <a (click)="_usuarioService.logout()" class="pointer"> <i class="fa fa-power-off"></i> Logout</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-devider"></li>
+
+                <li *ngFor="let menu of _sidebar.menuOperator">
+                    <a class="has-arrow waves-effect waves-dark" aria-expanded="false"> <i [class]="menu.icono"></i><span class="hide-menu"> {{ menu.titulo }}<span class="label label-rouded label-themecolor pull-right"> {{ menu.submenu.length }} </span></span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li *ngFor="let submenu of menu.submenu">
+                            <a routerLinkActive="active" [routerLink]="[ submenu.url ]"><i [class]="submenu.icono"></i> {{ submenu.titulo }}</a>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+
         </nav>
         <!-- End Sidebar navigation -->
     </div>

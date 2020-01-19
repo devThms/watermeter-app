@@ -26,21 +26,20 @@ $topbar-alt: #398bf7;
     .top-navbar .navbar-header .navbar-brand .light-logo {
         display: none;
     }
-    .top-navbar{
+    .top-navbar {
         .navbar-nav>.nav-item>span {
-            color:$themecolor;
+            color: $themecolor;
         }
     }
-    .navbar-light .navbar-nav .nav-item > {
+    .navbar-light .navbar-nav .nav-item> {
         a.nav-link {
             color: #a6b7bf;
             &:hover,
             &:focus {
-                color:#242a33!important;
+                color: #ebeef3!important;
             }
         }
     }
-    
 }
 
 .logo-center .topbar {
@@ -78,12 +77,12 @@ a.link {
     background-color: $themecolor !important;
 }
 
-.pagination > .active > a,
-.pagination > .active > span,
-.pagination > .active > a:hover,
-.pagination > .active > span:hover,
-.pagination > .active > a:focus,
-.pagination > .active > span:focus {
+.pagination>.active>a,
+.pagination>.active>span,
+.pagination>.active>a:hover,
+.pagination>.active>span:hover,
+.pagination>.active>a:focus,
+.pagination>.active>span:focus {
     background-color: $themecolor;
     border-color: $themecolor;
 }
@@ -200,9 +199,9 @@ a.link {
 .sidebar-nav ul li.nav-small-cap {
     color: $sidebar-text;
 }
-@media (min-width: 768px){
-    .mini-sidebar .sidebar-nav #sidebarnav > li:hover > a {
-        
+
+@media (min-width: 768px) {
+    .mini-sidebar .sidebar-nav #sidebarnav>li:hover>a {
         background: $sidebar-alt;
     }
 }

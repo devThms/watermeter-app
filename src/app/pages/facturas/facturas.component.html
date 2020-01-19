@@ -1,0 +1,522 @@
+<div class="row animated fadeIn" *ngIf="!activo">
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header bg-dark text-white">
+                Módulo de Facturación
+            </h5>
+
+            <div class="card-body text-black">
+                <h3> Debe realizar inicio de día, para comenzar a operar, comuniquese con su Supervisor.</h3>
+                <button *ngIf="_usuarioService.usuario.role_id === 1" (click)="activarDia()" class="btn btn-outline-success"> Iniciar Día</button>
+                <button *ngIf="_usuarioService.usuario.role_id === 2" (click)="activarDia()" class="btn btn-outline-success"> Iniciar Día</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animated fadeIn" *ngIf="activo">
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header bg-dark text-white">
+                Registro de facturación por zona
+                <span class="pull-right"> <button *ngIf="activo" (click)="cerrarDia()" class="btn btn-outline-danger">  Cierre de Día</button> </span>
+
+            </h5>
+
+            <div class="card-body text-black">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-md-12"> <b> Selecione Zona: </b></label>
+                        <div class="col-md-12">
+                            <div class="input-group mb-3">
+                                <select [(ngModel)]="zone.id" name="zone" class="form-control">
+                                    <option *ngFor="let zone of zones" [(value)]="zone.id">
+                                        {{ zone.description }}
+                                    </option>
+                                </select>
+                                <div class="input-group-append">
+                                    <button (click)="cargarMedidores( zone )" class="btn btn-outline-success" type="submit" id="button-addon2"> Aplicar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animated fadeIn" *ngIf="cargando">
+    <div class="col-sm-12">
+        <div class="alert alert-warning text-center">
+            <strong> Cargando </strong>
+            <br>
+            <i class=" fa fa-refresh fa-spin fa-2x"></i>
+            <br>
+            <span> Espere por favor</span>
+        </div>
+    </div>
+</div>
+
+<div class="row animated fadeIn" *ngIf="!cargando">
+    <div class="col-12" *ngIf="activo">
+        <div class="card">
+            <h5 class="card-header bg-dark text-white">
+                Medidores Registrados ( <small> {{ totalRegistros }} </small> )
+            </h5>
+
+            <div class="card-body text-black">
+                <div class="row">
+                    <div class="col-7">
+                        Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                    </div>
+                </div>
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th> # </th>
+                            <th> Cliente </th>
+                            <th> No. Serie </th>
+                            <th> Estado </th>
+                            <th width="300px"> Acciones </th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-dark">
+                        <tr *ngFor="let meter of meters">
+                            <td> {{ meter.id }} </td>
+                            <td> {{ meter.customer.firstName }} </td>
+                            <td> {{ meter.serialNumber }} </td>
+                            <td> {{ meter.status }} </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-info-circle"> Ord.</i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a (click)="showModalOrderLog( meter )" class="dropdown-item pointer"> <i class="fa fa-navicon"> Log</i> </a>
+                                        <a (click)="showModalOrderPago( meter )" class="dropdown-item pointer"> <i class="fa fa-dollar"> Pend. Pago</i> </a>
+                                    </div>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-newspaper-o"> Rec.</i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a (click)="showModalReceiptLog( meter )" class="dropdown-item pointer"> <i class="fa fa-navicon"> Log</i> </a>
+                                        <a (click)="showModalReceiptPago( meter )" class="dropdown-item pointer"> <i class="fa fa-dollar"> Pend. Pago</i> </a>
+                                    </div>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-file-text-o"> Fact.</i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a (click)="showModalInvoiceLog( meter )" class="dropdown-item pointer"> <i class="fa fa-navicon"> Log</i> </a>
+                                        <a (click)="showModalInvoicePago( meter )" class="dropdown-item pointer"> <i class="fa fa-dollar"> Pend. Pago</i> </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="col-12">
+                    <span class="pull-right">
+                        <!-- <button class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> Anteriores </button> -->
+                        <!-- <button class="btn btn-outline-inverse"> Siguientes <i class="fa fa-arrow-right"> </i></button> -->
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal Order Log -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalOrderLog">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-info-circle"> </i> Log de Ordenes ( <small> {{ totalRegistros }} </small> ) </b></h5>
+                    <button (click)="hideModalOrderLog()" type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body modal-body-scroll">
+
+                    <div class="row">
+                        <div class="col-7">
+                            Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                        </div>
+                    </div>
+
+                    <table class="table table-hover uk-table-condensed">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th> Mes </th>
+                                <th> Inicial </th>
+                                <th> Final </th>
+                                <th> Monto Q.</th>
+                                <th> Estado </th>
+                                <th width="150px"> Acciones </th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-dark">
+                            <tr *ngFor="let order of orders">
+                                <td> {{ order.id }} </td>
+                                <td> {{ order.month }} </td>
+                                <td> {{ order.initialMeasure }} </td>
+                                <td> {{ order.finalMeasure }} </td>
+                                <td> {{ order.ammount }} </td>
+                                <td> {{ order.status }} </td>
+                                <td>
+                                    <button class="btn btn-outline-success"> <i class="fa fa-file"> Factura</i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="col-12">
+                        <span class="pull-right">
+                                <button class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> </button>
+                                <button class="btn btn-outline-inverse"> <i class="fa fa-arrow-right"> </i></button>
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button (click)="hideModalOrderLog()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Order Pending Payment -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalOrderPago">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-info-circle"> </i> Ordenes Pendientes de Pago ( <small> {{ totalRegistros }} </small> )  </b></h5>
+                    <button (click)="hideModalOrderPago()" type="button" class="close" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+
+                <div class="modal-body modal-body-scroll">
+
+                    <div class="row">
+                        <div class="col-7">
+                            Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                        </div>
+                    </div>
+
+                    <table class="table table-hover uk-table-condensed">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th> Mes </th>
+                                <th> Inicial </th>
+                                <th> Final </th>
+                                <th> Monto Q. </th>
+                                <th> Estado </th>
+                                <th width="150px"> Acciones </th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-dark">
+                            <tr *ngFor="let order of orders">
+                                <td> {{ order.id }} </td>
+                                <td> {{ order.month }} </td>
+                                <td> {{ order.initialMeasure }} </td>
+                                <td> {{ order.finalMeasure }} </td>
+                                <td> {{ order.ammount }} </td>
+                                <td> {{ order.status }} </td>
+                                <td>
+                                    <button (click)="procesoFacturacion(order)" class="btn btn-outline-success"> <i class="fa fa-flag"> Facturar</i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="col-12">
+                        <span class="pull-right">
+                                    <button class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> </button>
+                                    <button class="btn btn-outline-inverse"> <i class="fa fa-arrow-right"> </i></button>
+                            </span>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button (click)="hideModalOrderPago()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Receipts Log -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalReceiptLog">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-info-circle"> </i> Log de Recibos de Caja ( <small> {{ totalRegistros }} </small> ) </b></h5>
+                    <button (click)="hideModalOrderLog()" type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body modal-body-scroll">
+
+                    <div class="row">
+                        <div class="col-7">
+                            Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                        </div>
+                    </div>
+
+                    <table class="table table-hover uk-table-condensed">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th> Mes </th>
+                                <th> No. Orden </th>
+                                <th> Descripcion </th>
+                                <th> Monto </th>
+                                <th> Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-dark">
+                            <tr *ngFor="let receipt of receipts">
+                                <td> {{ receipt.id }} </td>
+                                <td> {{ receipt.month }} </td>
+                                <td> {{ receipt.order_id }} </td>
+                                <td> {{ receipt.description }} </td>
+                                <td> {{ receipt.ammount }} </td>
+                                <td> {{ receipt.status }} </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="col-12">
+                        <span class="pull-right">
+                                <button class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> </button>
+                                <button class="btn btn-outline-inverse"> <i class="fa fa-arrow-right"> </i></button>
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button (click)="hideModalReceiptLog()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Receipts Pending Payment -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalReceiptPago">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-info-circle"> </i> Recibos de Caja Pendientes de Pago ( <small> {{ totalRegistros }} </small> ) </b></h5>
+                    <button (click)="hideModalOrderLog()" type="button" class="close" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+
+                <div class="modal-body modal-body-scroll">
+
+                    <div class="row">
+                        <div class="col-7">
+                            Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                        </div>
+                    </div>
+
+                    <table class="table table-hover uk-table-condensed">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th> Mes </th>
+                                <th> No. Orden </th>
+                                <th> Descripcion </th>
+                                <th> Monto </th>
+                                <th> Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-dark">
+                            <tr *ngFor="let receipt of receipts">
+                                <td> {{ receipt.id }} </td>
+                                <td> {{ receipt.month }} </td>
+                                <td> {{ receipt.order_id }} </td>
+                                <td> {{ receipt.description }} </td>
+                                <td> {{ receipt.ammount }} </td>
+                                <td> {{ receipt.status }} </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="col-12">
+                        <span class="pull-right">
+                                <button class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> </button>
+                                <button class="btn btn-outline-inverse"> <i class="fa fa-arrow-right"> </i></button>
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button (click)="hideModalReceiptPago()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Invoice Log -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalFacturaLog">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-info-circle"> </i> Log de Facturas ( <small> {{ totalRegistros }} </small> ) </b></h5>
+                    <button (click)="hideModalOrderLog()" type="button" class="close" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+
+                <div class="modal-body modal-body-scroll">
+
+                    <div class="row">
+                        <div class="col-7">
+                            Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                        </div>
+                    </div>
+
+                    <table class="table table-hover uk-table-condensed">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th> Mes </th>
+                                <th> No. Recibo </th>
+                                <th> Descripcion </th>
+                                <th> Monto </th>
+                                <th> Estado</th>
+                                <th> Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-dark">
+                            <tr *ngFor="let invoice of invoices">
+                                <td> {{ invoice.id }} </td>
+                                <td> {{ invoice.month }} </td>
+                                <td> {{ invoice.cash_receipt_id }} </td>
+                                <td> {{ invoice.description }} </td>
+                                <td> {{ invoice.ammount }} </td>
+                                <td> {{ invoice.status }} </td>
+                                <td>
+                                    <button (click)="cancelInvoice(invoice)" class="btn btn-outline-danger"> <i class="fa fa-trash-o"> Anular</i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="col-12">
+                        <span class="pull-right">
+                                <button class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> </button>
+                                <button class="btn btn-outline-inverse"> <i class="fa fa-arrow-right"> </i></button>
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button (click)="hideModalInvoiceLog()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Receipts Pending Payment -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalFacturaPago">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-info-circle"> </i> Facturas Pendientes de Pago ( <small> {{ totalRegistros }} </small> ) </b></h5>
+                    <button (click)="hideModalOrderLog()" type="button" class="close" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                            </button>
+                </div>
+
+                <div class="modal-body modal-body-scroll">
+
+                    <div class="row">
+                        <div class="col-7">
+                            Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                        </div>
+                    </div>
+
+                    <table class="table table-hover uk-table-condensed">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th> Mes </th>
+                                <th> No. Recibo </th>
+                                <th> Descripcion </th>
+                                <th> Monto </th>
+                                <th> Estado</th>
+                                <th width="150px"> Acciones </th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-dark">
+                            <tr *ngFor="let invoice of invoices">
+                                <td> {{ invoice.id }} </td>
+                                <td> {{ invoice.month }} </td>
+                                <td> {{ invoice.cash_receipt_id }} </td>
+                                <td> {{ invoice.description }} </td>
+                                <td> {{ invoice.ammount }} </td>
+                                <td> {{ invoice.status }} </td>
+                                <td>
+                                    <button (click)="payment(invoice)" class="btn btn-outline-success"> <i class="fa fa-money"> Pagar</i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="col-12">
+                        <span class="pull-right">
+                                <button class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> </button>
+                                <button class="btn btn-outline-inverse"> <i class="fa fa-arrow-right"> </i></button>
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button (click)="hideModalInvoicePago()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,1 +1,75 @@
-<p>dashboard works!</p>
+<div class="row animated fadeIn">
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header bg-dark text-white">
+                Reporte de Caja
+            </h5>
+
+            <div class="card-body text-black">
+
+                <form autocomplete="off" ngNativeValidate #f="ngForm" (ngSubmit)="cargarReporte(f.value)" class="form-horizontal form-material">
+                    <div class="form-group">
+                        <label class="col-md-4"> <b> Fecha Inicial </b></label>
+                        <div class="col-md-4">
+                            <input [(ngModel)]="from" name="from" type="date" class="form-control form-control-line">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4"> <b> Fecha Final </b></label>
+                        <div class="col-md-4">
+                            <input [(ngModel)]="to" name="to" type="date" class="form-control form-control-line">
+                        </div>
+                    </div>
+
+                    <select [(ngModel)]="usuario" name="usuario" class="form-control col-md-4">
+                            <option *ngFor="let user of users" [(value)]="user.id">
+                                {{ user.name }}
+                            </option>
+                    </select>
+                </form>
+
+                <br>
+                <div class="col-md-4">
+                    <button (click)="cargarReporte(usuario, from, to)" class="btn btn-outline-success" type="submit"> Aplicar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animated fadeIn" *ngIf="!cargando">
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header bg-dark text-white">
+                Facturas Registrados
+            </h5>
+
+            <div class="card-body text-black">
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th> No. Factura </th>
+                            <th> No. Recibo </th>
+                            <th> Descripcion </th>
+                            <th> Monto </th>
+                            <th> Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-dark">
+                        <tr *ngFor="let invoice of invoices">
+                            <td> {{ invoice.id }} </td>
+                            <td> {{ invoice.cash_receipt_id }} </td>
+                            <td> {{ invoice.description }} </td>
+                            <td> {{ invoice.ammount }} </td>
+                            <td> {{ invoice.status }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>

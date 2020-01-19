@@ -1,0 +1,317 @@
+<div class="row animated fadeIn">
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header bg-dark text-white">
+                Registro de ordenes por zona
+            </h5>
+
+            <div class="card-body text-black">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-md-12"> <b> Selecione Zona: </b></label>
+                        <div class="col-md-12">
+                            <div class="input-group mb-3">
+                                <select [(ngModel)]="zone.id" name="zone" class="form-control">
+                                    <option *ngFor="let zone of zones" [(value)]="zone.id">
+                                        {{ zone.description }}
+                                    </option>
+                                </select>
+                                <div class="input-group-append">
+                                    <button (click)="cargarMedidores( zone )" class="btn btn-outline-success" type="submit" id="button-addon2"> Aplicar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animated fadeIn" *ngIf="cargando">
+    <div class="col-sm-12">
+        <div class="alert alert-warning text-center">
+            <strong> Cargando </strong>
+            <br>
+            <i class=" fa fa-refresh fa-spin fa-2x"></i>
+            <br>
+            <span> Espere por favor</span>
+        </div>
+    </div>
+</div>
+
+<div class="row animated fadeIn" *ngIf="!cargando">
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header bg-dark text-white">
+                Medidores Registrados ( <small> {{ totalRegistros }} </small> )
+            </h5>
+
+            <div class="card-body text-black">
+                <div class="row">
+                    <div class="col-7">
+                        Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                    </div>
+                </div>
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th> # </th>
+                            <th> Cliente </th>
+                            <th> No. Serie </th>
+                            <th> Estado </th>
+                            <th width="200px"> Acciones </th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-dark">
+                        <tr *ngFor="let meter of meters">
+                            <td> {{ meter.id }} </td>
+                            <td> {{ meter.customer.firstName }} </td>
+                            <td> {{ meter.serialNumber }} </td>
+                            <td> {{ meter.status }} </td>
+                            <td>
+                                <button (click)="showModalCreate( meter )" class="btn btn-outline-success"><i class="fa fa-plus"> </i> </button>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-info-circle"> </i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a (click)="showModalOrderLog( meter )" class="dropdown-item pointer"> <i class="fa fa-navicon"> Log</i> </a>
+                                        <a (click)="showModalOrderPago( meter )" class="dropdown-item pointer"> <i class="fa fa-dollar"> Pend. Pago</i> </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="col-12">
+                    <span class="pull-right">
+                        <!-- <button [disabled]="pages.hasPrevious" (click)="cargarMedidores(pages.getPrevious())" class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> Anteriores </button> -->
+                        <!-- <button [disabled]="pages.hasNext" (click)="cargarMedidores(pages.getNext())" class="btn btn-outline-inverse"> Siguientes <i class="fa fa-arrow-right"> </i></button> -->
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal Create Order -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalCreate">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-plus"> </i> Crear Orden</b></h5>
+                    <button (click)="hideModalCreate()" type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form ngNativeValidate #fOrder="ngForm" (ngSubmit)="crearOrden(fOrder.value)" class="form-horizontal form-material" autocomplete="off">
+
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Medida Actual: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="order.finalMeasure" name="finalMeasure" type="text" class="form-control form-control-line" placeholder="Ej: 1001" required autofocus>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-success"><i class="fa fa-save"> </i> Guardar</button>
+                        <button (click)="hideModalCreate()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Update Order -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalUpdate">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-edit"> </i> Actualizar Datos de Orden No. {{ order.id }}</b></h5>
+                    <button (click)="hideModalUpdate()" type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form autocomplete="off" ngNativeValidate #fOrderUpd="ngForm" (ngSubmit)="actualizarOrden(fOrderUpd.value)" class="form-horizontal form-material">
+
+                    <div class="modal-body">
+
+                        <input [ngModel]="order.id" name="id" type="hidden">
+
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Mes de Ejecución: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="order.month" name="month" type="text" class="form-control form-control-line" disabled>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Medida Inicial: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="order.initialMeasure" name="initialMeasure" type="text" class="form-control form-control-line" disabled>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Medida Final: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="order.finalMeasure" name="finalMeasure" type="text" class="form-control form-control-line" placeholder="Ej: 1001" required autofocus>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-success"><i class="fa fa-save"> </i> Guardar</button>
+                        <button (click)="hideModalUpdate()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Order Log -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalOrderLog">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-info-circle"> </i> Log de Ordenes ( <small> {{ totalRegistros }} </small> ) </b></h5>
+                    <button (click)="hideModalOrderLog()" type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body modal-body-scroll">
+
+                    <div class="row">
+                        <div class="col-7">
+                            Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                        </div>
+                    </div>
+
+                    <table class="table table-hover uk-table-condensed">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th> Mes </th>
+                                <th> Inicial </th>
+                                <th> Final </th>
+                                <th> Monto Q.</th>
+                                <th> Estado </th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-dark">
+                            <tr *ngFor="let order of orders">
+                                <td> {{ order.id }} </td>
+                                <td> {{ order.month }} </td>
+                                <td> {{ order.initialMeasure }} </td>
+                                <td> {{ order.finalMeasure }} </td>
+                                <td> {{ order.ammount }} </td>
+                                <td> {{ order.status }} </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="col-12">
+                        <span class="pull-right">
+                                <button class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> </button>
+                                <button class="btn btn-outline-inverse"> <i class="fa fa-arrow-right"> </i></button>
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button (click)="hideModalOrderLog()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Order Pending Payment -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalOrderPago">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-info-circle"> </i> Ordenes Pendientes de Pago ( <small> {{ totalRegistros }} </small> )  </b></h5>
+                    <button (click)="hideModalOrderPago()" type="button" class="close" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+
+                <div class="modal-body modal-body-scroll">
+
+                    <div class="row">
+                        <div class="col-7">
+                            Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                        </div>
+                    </div>
+
+                    <table class="table table-hover uk-table-condensed">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th> Mes </th>
+                                <th> Inicial </th>
+                                <th> Final </th>
+                                <th> Monto Q. </th>
+                                <th> Estado </th>
+                                <th width="150px"> Acciones </th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-dark">
+                            <tr *ngFor="let order of orders">
+                                <td> {{ order.id }} </td>
+                                <td> {{ order.month }} </td>
+                                <td> {{ order.initialMeasure }} </td>
+                                <td> {{ order.finalMeasure }} </td>
+                                <td> {{ order.ammount }} </td>
+                                <td> {{ order.status }} </td>
+                                <td>
+                                    <button (click)="showModalUpdate( order )" class="btn btn-outline-primary"> <i class="fa fa-pencil-square-o"></i></button>
+                                    <button (click)="borrarOrden( order )" class="btn btn-outline-danger"> <i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="col-12">
+                        <span class="pull-right">
+                                    <button class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> </button>
+                                    <button class="btn btn-outline-inverse"> <i class="fa fa-arrow-right"> </i></button>
+                            </span>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button (click)="hideModalOrderPago()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

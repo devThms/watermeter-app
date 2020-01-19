@@ -1,0 +1,199 @@
+<div class="row animated fadeIn">
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header bg-dark text-white">
+                Gestion de medidores por zona
+            </h5>
+
+            <div class="card-body text-black">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-md-12"> <b> Selecione Zona: </b></label>
+                        <div class="col-md-12">
+                            <div class="input-group mb-3">
+                                <select [(ngModel)]="zone.id" name="zone" class="form-control">
+                                <option *ngFor="let zone of zones" [(value)]="zone.id">
+                                    {{ zone.description }}
+                                </option>
+                            </select>
+                                <div class="input-group-append">
+                                    <button (click)="cargarMedidores( zone )" class="btn btn-outline-success" type="submit" id="button-addon2">Aplicar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animated fadeIn" *ngIf="cargando">
+    <div class="col-sm-12">
+        <div class="alert alert-warning text-center">
+            <strong> Cargando </strong>
+            <br>
+            <i class=" fa fa-refresh fa-spin fa-2x"></i>
+            <br>
+            <span> Espere por favor</span>
+        </div>
+    </div>
+</div>
+
+<div class="row animated fadeIn" *ngIf="!cargando">
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header bg-dark text-white">
+                Medidores Registrados ( <small> {{ totalRegistros }} </small> )
+                <span class="pull-right"><button (click)="showModalCreate()" class="btn btn-rounded btn-outline-success"><i class="fa fa-plus"> </i> Crear </button></span>
+            </h5>
+
+            <div class="card-body text-black">
+                <div class="row">
+                    <div class="col-7">
+                        Mostrando [ <small> {{ registrosMostrados }} </small> ] registros
+                    </div>
+                </div>
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th> # </th>
+                            <th> Cliente </th>
+                            <th> No. Serie </th>
+                            <th> Estado </th>
+                            <th width="150px"> Acciones </th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-dark">
+                        <tr *ngFor="let meter of meters">
+                            <td> {{ meter.id }} </td>
+                            <td> {{ meter.customer.firstName }} </td>
+                            <td> {{ meter.serialNumber }} </td>
+                            <td> {{ meter.status }} </td>
+                            <td>
+                                <button (click)="showModalUpdate( meter )" class="btn btn-outline-primary"> <i class="fa fa-pencil-square-o"></i></button>
+                                <button (click)="borrarMedidor( meter )" class="btn btn-outline-danger"> <i class="fa fa-trash-o"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="col-12">
+                    <span class="pull-right">
+                                  <!-- <button [disabled]="pages.hasPrevious" (click)="cargarMedidores(pages.getPrevious())" class="btn btn-outline-inverse"><i class="fa fa-arrow-left"> </i> Anteriores </button> -->
+                                  <!-- <button [disabled]="pages.hasNext" (click)="cargarMedidores(pages.getNext())" class="btn btn-outline-inverse"> Siguientes <i class="fa fa-arrow-right"> </i></button> -->
+                          </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Create Meter -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalCreate">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-plus"> </i> Crear Medidor</b></h5>
+                    <button (click)="hideModalCreate()" type="button" class="close" aria-label="Close">
+                                 <span aria-hidden="true">&times;</span>
+                            </button>
+                </div>
+
+                <form ngNativeValidate #fMeter="ngForm" (ngSubmit)="crearMedidor(fMeter.value)" class="form-horizontal form-material" autocomplete="off">
+
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Cliente: </b></label>
+                            <div class="col-md-12">
+                                <select [(ngModel)]="meter.customer_id" name="customer_id" class="form-control" required>
+                                    <option *ngFor="let customer of customers" [(value)]="customer.id">
+                                        {{ customer.firstName }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> No. de Serie: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="meter.serialNumber" name="serialNumber" type="text" class="form-control form-control-line" placeholder="Ej: 456GHJ669..." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Dirección de Inmueble: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="meter.address" name="address" type="text" class="form-control form-control-line" placeholder="Ej: Zona 4, Escuintla" required>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-success"><i class="fa fa-save"> </i> Guardar</button>
+                        <button (click)="hideModalCreate()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Update Meter -->
+<div class="fondo-negro animated fadeIn" [ngClass]="modalUpdate">
+    <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b> <i class="fa fa-edit"> </i> Actualizar Datos de Cliente</b></h5>
+                    <button (click)="hideModalUpdate()" type="button" class="close" aria-label="Close">
+                                 <span aria-hidden="true">&times;</span>
+                            </button>
+                </div>
+
+                <form autocomplete="off" ngNativeValidate #fMeterUpd="ngForm" (ngSubmit)="actualizarMedidor(fMeterUpd.value)" class="form-horizontal form-material">
+
+                    <div class="modal-body">
+                        <input [ngModel]="meter.id" name="id" type="hidden">
+
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Cliente: </b></label>
+                            <div class="col-md-12">
+                                <select [(ngModel)]="meter.customer_id" name="customer_id" class="form-control" required>
+                                    <option *ngFor="let customer of customers" [(value)]="customer.id">
+                                        {{ customer.firstName }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> No. de Serie: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="meter.serialNumber" name="serialNumber" type="text" class="form-control form-control-line" placeholder="Ej: 456GHJ669..." required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12"> <b> Dirección de Inmueble: </b></label>
+                            <div class="col-md-12">
+                                <input [ngModel]="meter.address" name="address" type="text" class="form-control form-control-line" placeholder="Ej: Zona 4, Escuintla" required>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-success"><i class="fa fa-save"> </i> Guardar</button>
+                        <button (click)="hideModalUpdate()" type="button" class="btn btn-outline-inverse">Cerrar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>

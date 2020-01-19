@@ -1,10 +1,10 @@
 <body>
-    <form autocomplete="off" class="login">
+    <form ngNativeValidate #f="ngForm" autocomplete="off" class="login" (ngSubmit)="ingresar(f)">
         <h1 class="login-title">Bienvenido</h1>
-        <input name="email" required type="email" class="login-input" placeholder="Email Adress" autofocus>
-        <input ngModel name="password" required type="password" class="login-input" placeholder="Password">
+        <input [ngModel]="correo" name="correo" required type="email" class="login-input" placeholder="Correo Electronico" autofocus>
+        <input ngModel name="password" required type="password" class="login-input" placeholder="Contraseña">
         <div class="form-check">
-            <input name="recuerdame" type="checkbox" class="form-check-input" id="checkbox-signup">
+            <input [(ngModel)]="recuerdame" name="recuerdame" type="checkbox" class="form-check-input" id="checkbox-signup">
             <label class="form-check-label" for="checkbox-signup"> Recuérdame</label>
         </div>
         <input type="submit" value="Login" class="login-button">
